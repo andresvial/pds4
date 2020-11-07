@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'pdstelegrambot.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
+MONGO_CLIENT = MongoClient("mongodb+srv://andres:pds123456789@pdstelegrambot.atuu7.mongodb.net/pdstelegrambot?retryWrites=true&w=majority")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
