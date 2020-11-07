@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'pdstelegrambot',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +77,7 @@ MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "..", "tb_tutorial.sqlite3"),
+        "NAME": os.path.join(BASE_DIR, "..", "pdstelegrambot.sqlite3"),
     }
 }
 
