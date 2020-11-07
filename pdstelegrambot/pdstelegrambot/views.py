@@ -28,24 +28,26 @@ class TutorialBotView(View):
         if not chat:
             chat = {
                 "chat_id": t_chat["id"],
-                "word_responces": {}
+                "counter": 0
             }
             response = pdstelegrambot_collection.insert_one(chat)
             # we want chat obj to be the same as fetched from collection
             chat["_id"] = response.inserted_id
 
-        print(chat)
-        #If text comes with / at the start is a command
-        if text[0] == '/':
-            words = text.split()
-            if (words[0] == "/set_word"):
-                #/set_word <word> <responce>
-                self.set_word_responce(words[1], words[2], chat)
-            
-        #Else is just text
+        if text == "+":
+            chat["counter"] += 1
+            pdstelegrambot_collection.save(chat)
+            msg = f"Number of '+' messages that were parsed: {chat['counter']}"
+            self.send_message(msg, t_chat["id"])
+        elif text == "restart":
+            blank_data = {"counter": 0}
+            chat.update(blank_data)
+            pdstelegrambot_collection.save(chat)
+            msg = "The Tutorial bot was restarted"
+            self.send_message(msg, t_chat["id"])
         else:
-            text = text.lstrip("/")
-            self.send_automatic_responce(text, chat)
+            msg = "Unknown command"
+            self.send_message(msg, t_chat["id"])
 
         return JsonResponse({"ok": "POST request processed"})
 
