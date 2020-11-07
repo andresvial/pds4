@@ -126,4 +126,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, "..", "static_files")
 STATIC_URL = '/static/'
 
 
-MONGO_DB = MONGO_CLIENT.telegram_bots
+MONGO_DB = MONGO_CLIENT.pdstelegrambot
