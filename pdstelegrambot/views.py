@@ -53,7 +53,7 @@ class TutorialBotView(View):
             words = text.split()
             if (words[0] == "/set_word"):
                 #/set_word <word> <responce>
-                if(len(words<3)):
+                if(len(words)<3):
                     self.send_message("Error, please use the the format '/set_word <word> <response>'", chat["chat_id"])
                     return
                 self.set_word_responce(words[1], words[2:], chat)
@@ -61,8 +61,7 @@ class TutorialBotView(View):
             elif (words[0] == "/help"):
                 #Send list of commands
                 #/set_word
-                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-                self.send_message("/set_word <word> <response>: Set a automatic responce for a word sent by a user", chat["chat_id"])
+                self.send_message("'/set_word <word> <response>': Set a automatic responce for a word sent by a user", chat["chat_id"])
                 
             else:
                 self.send_message("Unknown command, type /help for list of commands", chat["chat_id"])
