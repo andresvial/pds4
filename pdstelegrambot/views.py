@@ -32,10 +32,10 @@ class TutorialBotView(View):
         print(t_data)
         try:
             t_message = t_data["message"]
-            t_chat = t_message["chat"]
             text = t_message["text"].strip().lower()
+            t_chat = t_message["chat"]
         except Exception as e:
-            return
+            return JsonResponse({"ok": "POST request processed"})
 
         chat = pdstelegrambot_collection.find_one({"chat_id": t_chat["id"]})
         if not chat:
