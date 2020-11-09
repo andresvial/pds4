@@ -53,6 +53,14 @@ class TutorialBotView(View):
             if (words[0] == "/set_word"):
                 #/set_word <word> <responce>
                 self.set_word_responce(words[1], words[2], chat)
+                
+            elif (words[0] == "/help"):
+                #Send list of commands
+                #/set_word
+                self.send_message("/set_word word response: Set a automatic responce for a word sent by a user", chat["chat_id"])
+                
+            else:
+                self.send_message("Unknown command, type /help for list of commands", chat["chat_id"])
             
         #Else is just text
         else:
