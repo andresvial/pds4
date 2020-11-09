@@ -23,7 +23,7 @@ class TutorialBotView(View):
     def set_word_responce(self, word, responce,  chat):
         #Get dictionary of words with responce:
         automatic_responce_dic = chat["word_responces"]
-        automatic_responce_dic[word] = responce
+        automatic_responce_dic[word] = " ".join(responce)
         pdstelegrambot_collection.save(chat)
     
     def post(self, request, *args, **kwargs):
