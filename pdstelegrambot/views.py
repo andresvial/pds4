@@ -55,8 +55,8 @@ class TutorialBotView(View):
                 #/set_word <word> <responce>
                 if(len(words)<3):
                     self.send_message("Error, please use the the format '/set_word <word> <response>'", chat["chat_id"])
-                    return
-                self.set_word_responce(words[1], words[2:], chat)
+                else:
+                    self.set_word_responce(words[1], words[2:], chat)
                 
             elif (words[0] == "/help"):
                 #Send list of commands
