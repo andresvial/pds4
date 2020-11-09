@@ -28,8 +28,8 @@ class TutorialBotView(View):
         self.send_message("Response set for" + word, chat["chat_id"])
     
     def post(self, request, *args, **kwargs):
-        print(t_data)
         t_data = json.loads(request.body)
+        print(t_data)
         t_message = t_data["message"]
         t_chat = t_message["chat"]
 
