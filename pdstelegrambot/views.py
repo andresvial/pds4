@@ -35,7 +35,7 @@ class TutorialBotView(View):
             t_chat = t_message["chat"]
             text = t_message["text"].strip().lower()
         except Exception as e:
-            pass
+            return
 
         chat = pdstelegrambot_collection.find_one({"chat_id": t_chat["id"]})
         if not chat:
