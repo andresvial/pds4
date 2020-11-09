@@ -25,7 +25,7 @@ class TutorialBotView(View):
         automatic_responce_dic = chat["word_responces"]
         automatic_responce_dic[word] = " ".join(responce)
         pdstelegrambot_collection.save(chat)
-        self.send_message("Response set for" + word, chat["chat_id"])
+        self.send_message("Response set for " + word, chat["chat_id"])
     
     def post(self, request, *args, **kwargs):
         t_data = json.loads(request.body)
@@ -48,20 +48,20 @@ class TutorialBotView(View):
             # we want chat obj to be the same as fetched from collection
             chat["_id"] = response.inserted_id
 
-        print(chat)
         #If text comes with / at the start is a command
         if text[0] == '/':
             words = text.split()
             if (words[0] == "/set_word"):
                 #/set_word <word> <responce>
-                try:
-                    self.set_word_responce(words[1], words[2:], chat)
-                except Exception as e:
+                if(len(words<3)):
                     self.send_message("Error, please use the the format '/set_word <word> <response>'", chat["chat_id"])
+                    return
+                self.set_word_responce(words[1], words[2:], chat)
                 
             elif (words[0] == "/help"):
                 #Send list of commands
                 #/set_word
+                print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
                 self.send_message("/set_word <word> <response>: Set a automatic responce for a word sent by a user", chat["chat_id"])
                 
             else:
