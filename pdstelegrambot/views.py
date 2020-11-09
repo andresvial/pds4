@@ -25,8 +25,10 @@ class TutorialBotView(View):
         automatic_responce_dic = chat["word_responces"]
         automatic_responce_dic[word] = " ".join(responce)
         pdstelegrambot_collection.save(chat)
+        self.send_message("Response set for" + word, chat["chat_id"])
     
     def post(self, request, *args, **kwargs):
+        print(t_data)
         t_data = json.loads(request.body)
         t_message = t_data["message"]
         t_chat = t_message["chat"]
