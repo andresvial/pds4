@@ -1,9 +1,10 @@
-import json
+import json,datetime
 import requests
 from django.http import JsonResponse
 from django.views import View
 
 from .models import pdstelegrambot_collection
+from .models import message_collection
 
 TELEGRAM_URL = "https://api.telegram.org/bot"
 TUTORIAL_BOT_TOKEN = "1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo"
@@ -68,6 +69,16 @@ class TutorialBotView(View):
         #Else is just text
         else:
             text = text.lstrip("/")
+            #Insert the message in the databasse for messages
+            msg = {
+                "chat_id": t_chat["id"],
+                "user_id": t_message["from"]["id"],
+                "user_first_name": t_message["from"]["first_name"],
+                "user_last_name": t_message["from"]["last_name"],
+                "datetime": datetime.datetime.utcnow(),
+                "message": text
+            }
+            message_collection.insert_one(msg)
             self.send_automatic_responce(text, chat)
 
         return JsonResponse({"ok": "POST request processed"})
