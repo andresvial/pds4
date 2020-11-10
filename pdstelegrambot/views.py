@@ -67,6 +67,30 @@ class TutorialBotView(View):
         
     ##################################################################################
     
+    def innactive_users(self, chat_id, period):
+        d = datetime.utcnow() - timedelta(days=period)
+        
+        users_in_period = message_collection.find({"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}).distinct('user_id')
+        
+        all_users = message_collection.find({ "chat_id" : chat_id}).distinct('user_id')
+        
+        set_difference = set(all_users) - set(users_in_period)
+        list_difference = list(set_difference)
+        
+        string=""
+        if len(list_difference)==0:
+            self.send_message("No inactive user found", chat_id)
+            
+        else:       
+            for u_id in list_difference:
+                usr = user_collection.find_one({"user_id": u_id})
+                string += usr["first_name"] + " " +usr["last_name"] + '\n'
+            
+            self.send_message("Inactive users in "+ str(period) +" days: \n" + string, chat_id)
+    
+    
+    ##################################################################################
+    
     def post(self, request, *args, **kwargs):
         t_data = json.loads(request.body)
         print(t_data)
@@ -108,11 +132,26 @@ class TutorialBotView(View):
                 except Exception as e:
                     self.send_message("Error, please use the format: /get\_user\_most\_sent\_messages \[days]", chat["chat_id"])
                     
+            #/innactive_users [days]
+            elif (words[0] == "/innactive_users"):        
+                try:
+                    if(len(words)==2 and int(words[1])>0):
+                        self.innactive_users(chat["chat_id"], int(words[1]))
+                    elif(len(words)==1):
+                        self.innactive_users(chat["chat_id"], 7)
+                    else:
+                        self.send_message("Error, please use the format: /get\_user\_most\_sent\_messages \[days]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
+                    
             #/help
             elif (words[0] == "/help"):
                 #Send list of commands
-                self.send_message("/set\_word <word> <response>: Set a automatic responce for a word sent by a user", chat["chat_id"])
-                self.send_message("/get\_user\_most\_sent\_messages \[days]: Get the user with most messages in a certain period of time", chat["chat_id"])
+                string=""
+                string+="/set\_word <word> <response>: Set a automatic responce for a word sent by a user \n"
+                string+="/get\_user\_most\_sent\_messages \[days]: Get the user with most messages in a certain period of time \n"
+                string+="/innactive\_users \[days]: Get innactive users in a certain period of time \n"
+                self.send_message(string, chat["chat_id"])
                 
             else:
                 self.send_message("Unknown command, type /help for list of commands", chat["chat_id"])
