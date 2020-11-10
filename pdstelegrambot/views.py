@@ -48,7 +48,6 @@ class TutorialBotView(View):
             # we want chat obj to be the same as fetched from collection
             chat["_id"] = response.inserted_id
 
-        aaaaa = message_collection.insert_one(chat)
         #If text comes with / at the start is a command
         if text[0] == '/':
             words = text.split()
@@ -70,6 +69,15 @@ class TutorialBotView(View):
         #Else is just text
         else:
             text = text.lstrip("/")
+            #Insert the message in the databasse for messages
+            msg = {
+                "chat_id": t_chat["id"],
+                "user_id": t_message["from"]["id"],
+                "user_first_name": t_message["from"]["first_name"],
+                "user_last_name": t_message["from"]["last_name"],
+                "message": text
+            }
+            message_collection.insert_one(msg)
             self.send_automatic_responce(text, chat)
 
         return JsonResponse({"ok": "POST request processed"})
