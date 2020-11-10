@@ -1,4 +1,4 @@
-import json
+import json,datetime
 import requests
 from django.http import JsonResponse
 from django.views import View
@@ -75,6 +75,7 @@ class TutorialBotView(View):
                 "user_id": t_message["from"]["id"],
                 "user_first_name": t_message["from"]["first_name"],
                 "user_last_name": t_message["from"]["last_name"],
+                "datetime": datetime.datetime.utcnow(),
                 "message": text
             }
             message_collection.insert_one(msg)
