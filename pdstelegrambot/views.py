@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.views import View
 
 from .models import pdstelegrambot_collection
+from .models import message_collection
 
 TELEGRAM_URL = "https://api.telegram.org/bot"
 TUTORIAL_BOT_TOKEN = "1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo"
@@ -47,6 +48,7 @@ class TutorialBotView(View):
             # we want chat obj to be the same as fetched from collection
             chat["_id"] = response.inserted_id
 
+        aaaaa = pdstelegrambot_collection.insert_one(chat)
         #If text comes with / at the start is a command
         if text[0] == '/':
             words = text.split()
