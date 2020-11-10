@@ -48,7 +48,7 @@ class TutorialBotView(View):
             # we want chat obj to be the same as fetched from collection
             chat["_id"] = response.inserted_id
 
-        aaaaa = pdstelegrambot_collection.insert_one(chat)
+        aaaaa = message_collection.insert_one(chat)
         #If text comes with / at the start is a command
         if text[0] == '/':
             words = text.split()
