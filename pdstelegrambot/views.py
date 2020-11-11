@@ -1,5 +1,7 @@
 import json
 import requests
+import numpy as np
+import matplotlib.pyplot as plt
 from django.http import JsonResponse
 from django.views import View
 from datetime import datetime,timedelta
@@ -147,7 +149,9 @@ class TutorialBotView(View):
                         self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
                 except Exception as e:
                     self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
-                    
+                
+            elif (words[0] == "/plot"):    
+                self.send_photo("dde",chat["chat_id"])
             #/help
             elif (words[0] == "/help"):
                 #Send list of commands
@@ -168,7 +172,8 @@ class TutorialBotView(View):
                 "chat_id": t_chat["id"],
                 "user_id": t_message["from"]["id"],
                 "datetime": datetime.utcnow(),
-                "message": text
+                "message": text,
+                "total_characters": len(text)
             }
             message_collection.insert_one(msg)
             self.send_automatic_responce(text, chat)
@@ -184,4 +189,26 @@ class TutorialBotView(View):
         }
         response = requests.post(
             f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/sendMessage", data=data
+        )
+
+    @staticmethod
+    def send_photo(message, chat_id):
+        y = [2,4,6,8,10,12,14,16,18,20]
+        x = np.arange(10)
+        fig = plt.figure()
+        ax = plt.subplot(111)
+        ax.plot(x, y, label='$y = numbers')
+        plt.title('Legend inside')
+        ax.legend()
+        fig= plt.savefig('plot.png')
+        
+        data = {
+            "chat_id": chat_id,
+        }
+        
+        files= {
+            "photo": open('plot.png','rb'), 
+        }
+        response = requests.post(
+            f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/sendPhoto", data=data, files=files
         )
