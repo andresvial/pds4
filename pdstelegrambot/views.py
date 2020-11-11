@@ -1,7 +1,5 @@
 import json
 import requests
-import numpy as np
-import matplotlib.pyplot as plt
 from django.http import JsonResponse
 from django.views import View
 from datetime import datetime,timedelta
