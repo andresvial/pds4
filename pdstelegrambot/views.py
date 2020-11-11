@@ -1,18 +1,24 @@
-import json,datetime
+import json
 import requests
+import numpy as np
+import matplotlib.pyplot as plt
 from django.http import JsonResponse
 from django.views import View
 from datetime import datetime,timedelta
 
 from .models import pdstelegrambot_collection
 from .models import message_collection
-from .models import user_collection
 
 TELEGRAM_URL = "https://api.telegram.org/bot"
 TUTORIAL_BOT_TOKEN = "1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo"
   
 # https://api.telegram.org/bot1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo/setWebhook?url=<url>/webhooks/tutorial/
 class TutorialBotView(View):
+    def get_user_info(self, chat_id, user_id):
+        x = requests.get(f"https://api.telegram.org/bot{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": user_id})
+        x = json.loads(x.content)
+        return x
+    
     def send_automatic_responce(self, sentence, chat):
         #Auxiliary list to not repeat words
         list_aux=[]
@@ -58,9 +64,9 @@ class TutorialBotView(View):
                 max_user_messages_count = cant_msg
                 max_user_id = i['_id']['user_id']
         
-        usr = user_collection.find_one({"user_id": max_user_id})
+        usr = self.get_user_info(chat_id, max_user_id)
         if usr:
-            r=usr["first_name"] + " " +usr["last_name"]
+            r=usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"]
             self.send_message("The user that sent the most messages in the past "+ str(period) +" days is " + r, chat_id)
         else:
             self.send_message("Error in the request", chat_id)
@@ -83,8 +89,8 @@ class TutorialBotView(View):
             
         else:       
             for u_id in list_difference:
-                usr = user_collection.find_one({"user_id": u_id})
-                string += usr["first_name"] + " " +usr["last_name"] + '\n'
+                usr = self.get_user_info(chat_id, u_id)
+                string += usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"] + '\n'
             
             self.send_message("Inactive users in "+ str(period) +" days: \n" + string, chat_id)
     
@@ -140,7 +146,7 @@ class TutorialBotView(View):
                     elif(len(words)==1):
                         self.innactive_users(chat["chat_id"], 7)
                     else:
-                        self.send_message("Error, please use the format: /get\_user\_most\_sent\_messages \[days]", chat["chat_id"])
+                        self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
                 except Exception as e:
                     self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
                     
@@ -168,16 +174,6 @@ class TutorialBotView(View):
             }
             message_collection.insert_one(msg)
             self.send_automatic_responce(text, chat)
-            
-            #Insert/update user in the user database if is not already
-            usr = user_collection.find_one({"user_id": t_message["from"]["id"]})
-            if not usr:
-                usr={
-                    "user_id": t_message["from"]["id"],
-                    "first_name": t_message["from"]["first_name"],
-                    "last_name": t_message["from"]["last_name"],
-                }
-                user_collection.insert_one(usr)
 
         return JsonResponse({"ok": "POST request processed"})
 
