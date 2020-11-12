@@ -97,7 +97,7 @@ class TutorialBotView(View):
         for i in val:
             if i["characters"] >= max_user_characters:
                 max_user_id = i["_id"]["user_id"]
-                max_usesr_characters = i["characters"]
+                max_user_characters = i["characters"]
         
         usr = self.get_user_info(chat_id, max_user_id)
         if usr:
