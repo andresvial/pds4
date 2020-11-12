@@ -72,7 +72,41 @@ class TutorialBotView(View):
             self.send_message("Error in the request", chat_id)
         
     ##################################################################################
-    
+    # Pregunta 3: Usuario que ha enviado más caracteres
+
+    def get_user_most_characters(self, chat_id, period):
+        d = datetime.utcnow() - timedelta(days=period)
+        
+        agr = [
+               {"$match": {"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}},
+               {'$group': {
+                            "_id": {
+                                  "user_id": "$user_id",
+                            },
+                            "characters": {
+                                  "$sum": "$total_characters"
+                            }
+                        }
+                }]
+        
+        val = list(message_collection.aggregate(agr))
+        
+        max_user_id = 0
+        max_user_characters = 0
+        
+        for i in val:
+            if i["characters"] >= max_user_characters:
+                max_user_id = i["_id"]["user_id"]
+                max_usesr_characters = i["characters"]
+        
+        usr = self.get_user_info(chat_id, max_user_id)
+        if usr:
+            r=usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"]
+            self.send_message("The user that sent the most characters in the past "+ str(period) +" days is " + r, chat_id)
+        else:
+            self.send_message("Error in the request", chat_id)
+
+    ##################################################################################
     def innactive_users(self, chat_id, period):
         d = datetime.utcnow() - timedelta(days=period)
         
