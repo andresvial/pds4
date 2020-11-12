@@ -74,7 +74,7 @@ class TutorialBotView(View):
     ##################################################################################
     # Pregunta 3: Usuario que ha enviado más caracteres
 
-    def get_user_most_characters(self, chat_id, period):
+    def get_user_most_sent_characters(self, chat_id, period):
         d = datetime.utcnow() - timedelta(days=period)
         
         agr = [
@@ -171,7 +171,20 @@ class TutorialBotView(View):
                         self.send_message("Error, please use the format: /get\_user\_most\_sent\_messages \[days]", chat["chat_id"])
                 except Exception as e:
                     self.send_message("Error, please use the format: /get\_user\_most\_sent\_messages \[days]", chat["chat_id"])
+
+            #/get_user_most_sent_characters [days]
+            elif (words[0] == "/get_user_most_sent_characters"):
+                try:
+                    if(len(words)==2 and int(words[1])>0):
+                        self.get_user_most_sent_characters(chat["chat_id"], int(words[1]))
+                    elif(len(words)==1):
+                        self.get_user_most_sent_characters(chat["chat_id"], 7)
+                    else:
+                        self.send_message("Error, please use the format: /get\_user\_most\_sent\_characters \[days]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message("Error, please use the format: /get\_user\_most\_sent\_characters \[days]", chat["chat_id"])
                     
+                 
             #/innactive_users [days]
             elif (words[0] == "/innactive_users"):        
                 try:
