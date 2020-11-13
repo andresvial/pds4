@@ -107,6 +107,38 @@ class TutorialBotView(View):
             self.send_message("Error in the request", chat_id)
 
     ##################################################################################
+    # Pregunta 5 Mensajes x Dia
+    def get_messages_by_day(self, chat_id, period):
+        d = datetime.utcnow() - timedelta(days=period)
+        
+        agr = [
+            {"$match": {"$and": [{ "chat_id" : -439406000}, {"datetime": {"$gte": d}}]}},
+            {'$project': 
+                { 'formattedMsgDate':
+                        { "$dateToString": {'format':"%Y-%m-%d", 'date':"$datetime"}}
+                }
+            },
+            {'$group': {
+                    "_id": "$formattedMsgDate",
+                    "count":{"$sum":1}
+                }
+            }
+        ]
+        
+        val = list(message_collection.aggregate(agr))
+        
+        #pasar los datos en val a una imagen
+        
+        usr = val[0]
+        if usr:
+            r = ""
+            for i in val:
+                r+= i["_id"] + ": " + i["count"] + "\n"
+            self.send_message("The ammount of messages by day sent in the past "+ str(period) +" days is:\n" + r, chat_id)
+        else:
+            self.send_message("Error in the request", chat_id)
+    
+    ##################################################################################
     def innactive_users(self, chat_id, period):
         d = datetime.utcnow() - timedelta(days=period)
         
