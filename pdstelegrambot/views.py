@@ -131,6 +131,53 @@ class TutorialBotView(View):
     
     
     ##################################################################################
+    #Pregunta 6: obtener un grafico de la cantidad de caracteres por dia
+    def characters_per_day(self, chat_id, period):
+        d= datetime.utcnow() - timedelta(days=period)
+
+        agr = [
+               {"$match": {"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}},
+               {'$group': {
+                            "_id": {
+                                "day": { "$dayOfMonth": "$datetime" },
+                                "month": { "$month": "$datetime" },
+                                "year": { "$year": "$datetime" }
+                            },
+                            "messages": {
+                                  "$addToSet": "$message"
+                            },
+                            "total_characters":{
+                                    "$sum": "$total_characters"
+                            }
+                        }
+                }]
+    
+        val = list(message_collection.aggregate(agr))
+        
+        x=[]
+        y=[0] * period
+        
+        base=datetime.utcnow()
+        for i in reversed(range(period)):
+            aux= base - timedelta(days=int(i))
+            x.append(str(aux.day) + "/" + str(aux.month) + "/" + str(aux.year))
+            
+            
+        for i in val:
+            date= str(i["_id"]["day"]) + "/" + str(i["_id"]["month"]) + "/" + str(i["_id"]["year"])
+            if (date in x):
+                y[x.index(date)] = i["total_characters"]
+                
+        plt.figure()
+        ax = plt.subplot()
+        plt.xticks(rotation=90)
+        ax.bar(x,y)
+        plt.title('Characters sent across the past '+ str(period) +" days" )
+        plt.savefig('characters_per_day.png')
+        self.send_photo('characters_per_day.png', chat_id)
+        
+    
+    ###################################################################################
     
     def post(self, request, *args, **kwargs):
         t_data = json.loads(request.body)
@@ -197,9 +244,19 @@ class TutorialBotView(View):
                         self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
                 except Exception as e:
                     self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
+            
+            #//characters_per_day [days]
+            elif (words[0] == "/characters_per_day"):    
+                try:
+                    if(len(words)==2 and int(words[1])>0):
+                        self.characters_per_day(chat["chat_id"], int(words[1]))
+                    elif(len(words)==1):
+                        self.characters_per_day(chat["chat_id"], 7)
+                    else:
+                        self.send_message("Error, please use the format: /characters\_per\_day \[days]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message("Error, please use the format: /characters\_per\_day \[days]", chat["chat_id"])
                 
-            elif (words[0] == "/plot"):    
-                self.send_photo("dde",chat["chat_id"])
             #/help
             elif (words[0] == "/help"):
                 #Send list of commands
@@ -207,6 +264,7 @@ class TutorialBotView(View):
                 string+="/set\_word <word> <response>: Set a automatic responce for a word sent by a user \n"
                 string+="/get\_user\_most\_sent\_messages \[days]: Get the user with most messages in a certain period of time \n"
                 string+="/innactive\_users \[days]: Get innactive users in a certain period of time \n"
+                string+="/characters\_per\_day \[days]: Get a graph showing the total of characters in a certain period \n"
                 self.send_message(string, chat["chat_id"])
                 
             else:
@@ -249,23 +307,14 @@ class TutorialBotView(View):
         )
 
     @staticmethod
-    def send_photo(message, chat_id):
-        y = [2,4,6,8,10,12,14,16,18,20]
-        x = np.arange(10)
-        fig = plt.figure()
-        ax = plt.subplot(111)
-        ax.plot(x, y, label='$y = numbers')
-        plt.title('Legend inside')
-        ax.legend()
-        fig= plt.savefig('plot.png')
-        
+    def send_photo(name_of_graph, chat_id):        
         data = {
             "chat_id": chat_id,
         }
         
         files= {
-            "photo": open('plot.png','rb'), 
+            "photo": open(name_of_graph,'rb'), 
         }
-        response = requests.post(
+        requests.post(
             f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/sendPhoto", data=data, files=files
         )
