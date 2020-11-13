@@ -133,8 +133,10 @@ class TutorialBotView(View):
     ##################################################################################
     #Pregunta 6: obtener un grafico de la cantidad de caracteres por dia en un periodo de dias
     def characters_per_day(self, chat_id, period):
+        #Get date minus the period of days
         d= datetime.utcnow() - timedelta(days=period)
 
+        #Query for the database, group all messages and characters by datetime
         agr = [
                {"$match": {"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}},
                {'$group': {
@@ -154,20 +156,23 @@ class TutorialBotView(View):
     
         val = list(message_collection.aggregate(agr))
         
+        #Lists to plot later
         x=[]
         y=[0] * period
         
+        #Fill the x list with the dates for the graphs
         base=datetime.utcnow()
         for i in reversed(range(period)):
             aux= base - timedelta(days=int(i))
             x.append(str(aux.day) + "/" + str(aux.month) + "/" + str(aux.year))
             
-            
+        #Fill the y list with the respective characters sent by each date position of x
         for i in val:
             date= str(i["_id"]["day"]) + "/" + str(i["_id"]["month"]) + "/" + str(i["_id"]["year"])
             if (date in x):
                 y[x.index(date)] = i["total_characters"]
-                
+            
+        #Plot the graph and send it
         plt.figure()
         ax = plt.subplot()
         plt.xticks(rotation=90)
@@ -183,7 +188,7 @@ class TutorialBotView(View):
         #Get date minus the period of days
         d= datetime.utcnow() - timedelta(days=period)
 
-        #Query for the database, group all messages and characters by userand datetime
+        #Query for the database, group all characters by user and datetime
         agr = [
                {"$match": {"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}},
                {'$group': {
@@ -211,7 +216,7 @@ class TutorialBotView(View):
             y.append(i["characters"])
             
         
-        #Plot the graph
+        #Plot the graph and send it
         plt.figure()
         ax = plt.subplot()
         plt.xticks(rotation=90)
