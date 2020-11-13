@@ -173,7 +173,7 @@ class TutorialBotView(View):
         plt.xticks(rotation=90)
         ax.bar(x,y)
         plt.title('Characters sent across the past '+ str(period) +" days" )
-        plt.savefig('characters_per_day.png')
+        plt.savefig('characters_per_day.png', bbox_inches='tight')
         self.send_photo('characters_per_day.png', chat_id)
         
     
