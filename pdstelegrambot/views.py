@@ -107,6 +107,7 @@ class TutorialBotView(View):
             self.send_message("Error in the request", chat_id)
 
     ##################################################################################
+    #Pregunta 4: Obtener usuarios inactivos en un periodo de tiempo
     def innactive_users(self, chat_id, period):
         d = datetime.utcnow() - timedelta(days=period)
         
@@ -216,13 +217,22 @@ class TutorialBotView(View):
             text = text.lstrip("/")
             #Insert the message in the databasse for messages
             msg = {
+                "message_id": t_message["message_id"],
                 "chat_id": t_chat["id"],
                 "user_id": t_message["from"]["id"],
                 "datetime": datetime.utcnow(),
                 "message": text,
-                "total_characters": len(text)
+                "total_characters": len(text),
+                "replies": 0
+                
             }
             message_collection.insert_one(msg)
+            
+            #Append to reply array of another message if it is a reply
+            if ("reply_to_message" in t_message):
+                message_collection.update_one({"$and": [{ "chat_id" : t_chat["id"]}, {"message_id": t_message["reply_to_message"]["message_id"]}]}, {'$inc': {'replies': 1}})
+            
+            #Send automatic response if there is one
             self.send_automatic_responce(text, chat)
 
         return JsonResponse({"ok": "POST request processed"})
