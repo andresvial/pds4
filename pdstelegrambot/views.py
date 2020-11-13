@@ -15,7 +15,7 @@ TUTORIAL_BOT_TOKEN = "1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo"
 # https://api.telegram.org/bot1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo/setWebhook?url=<url>/webhooks/tutorial/
 class TutorialBotView(View):
     def get_user_info(self, chat_id, user_id):
-        x = requests.get(f"https://api.telegram.org/bot{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": user_id})
+        x = requests.get(f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": user_id})
         x = json.loads(x.content)
         return x
     
@@ -131,7 +131,7 @@ class TutorialBotView(View):
     
     
     ##################################################################################
-    #Pregunta 6: obtener un grafico de la cantidad de caracteres por dia
+    #Pregunta 6: obtener un grafico de la cantidad de caracteres por dia en un periodo de dias
     def characters_per_day(self, chat_id, period):
         d= datetime.utcnow() - timedelta(days=period)
 
@@ -178,6 +178,49 @@ class TutorialBotView(View):
         
     
     ###################################################################################
+    #Pregunta 8: obtener un grafico de la cantidad de caracteres por usuario en un periodo de dias
+    def characters_per_user(self, chat_id, period):
+        #Get date minus the period of days
+        d= datetime.utcnow() - timedelta(days=period)
+
+        #Query for the database, group all messages and characters by userand datetime
+        agr = [
+               {"$match": {"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}},
+               {'$group': {
+                            "_id": {
+                                  "user_id": "$user_id",
+                            },
+                            "characters":{
+                                    "$sum": "$total_characters"
+                            }
+                        }
+                }
+                ]
+        
+        val = list(message_collection.aggregate(agr))
+        
+        #Lists to plot later
+        x=[]
+        y=[]
+        
+        #Iterate in the query obtained and append each user and its sum of characters to x and y
+        for i in val:
+            usr = requests.get(f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": i["_id"]["user_id"]})
+            usr = json.loads(usr.content)
+            x.append(usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"])
+            y.append(i["characters"])
+            
+        
+        #Plot the graph
+        plt.figure()
+        ax = plt.subplot()
+        plt.xticks(rotation=90)
+        ax.bar(x,y)
+        plt.title("Characters sent per user")
+        plt.savefig('characters_per_user.png', bbox_inches='tight')  
+        self.send_photo('characters_per_user.png', chat_id)
+        
+    ##################################################################################
     
     def post(self, request, *args, **kwargs):
         t_data = json.loads(request.body)
@@ -202,13 +245,13 @@ class TutorialBotView(View):
         #If text comes with / at the start is a command
         if text[0] == '/':
             words = text.split()
-            #/set_word <word> <responce>
+            #1:/set_word <word> <responce>
             if (words[0] == "/set_word"):
                 if(len(words)<3):
                     self.send_message("Error, please use the format: /set\_word <word> <response>", chat["chat_id"])
                 else:
                     self.set_word_responce(words[1], words[2:], chat)
-            #/get_user_most_sent_messages [days]
+            #2:/get_user_most_sent_messages [days]
             elif (words[0] == "/get_user_most_sent_messages"):
                 try:
                     if(len(words)==2 and int(words[1])>0):
@@ -220,7 +263,7 @@ class TutorialBotView(View):
                 except Exception as e:
                     self.send_message("Error, please use the format: /get\_user\_most\_sent\_messages \[days]", chat["chat_id"])
 
-            #/get_user_most_sent_characters [days]
+            #3:/get_user_most_sent_characters [days]
             elif (words[0] == "/get_user_most_sent_characters"):
                 try:
                     if(len(words)==2 and int(words[1])>0):
@@ -233,7 +276,7 @@ class TutorialBotView(View):
                     self.send_message("Error, please use the format: /get\_user\_most\_sent\_characters \[days]", chat["chat_id"])
                     
                  
-            #/innactive_users [days]
+            #4:/innactive_users [days]
             elif (words[0] == "/innactive_users"):        
                 try:
                     if(len(words)==2 and int(words[1])>0):
@@ -245,7 +288,7 @@ class TutorialBotView(View):
                 except Exception as e:
                     self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
             
-            #//characters_per_day [days]
+            #6:/characters_per_day [days]
             elif (words[0] == "/characters_per_day"):    
                 try:
                     if(len(words)==2 and int(words[1])>0):
@@ -256,6 +299,18 @@ class TutorialBotView(View):
                         self.send_message("Error, please use the format: /characters\_per\_day \[days]", chat["chat_id"])
                 except Exception as e:
                     self.send_message("Error, please use the format: /characters\_per\_day \[days]", chat["chat_id"])
+                    
+            #8:/characters_per_user [days]
+            elif (words[0] == "/characters_per_user"):    
+                try:
+                    if(len(words)==2 and int(words[1])>0):
+                        self.characters_per_user(chat["chat_id"], int(words[1]))
+                    elif(len(words)==1):
+                        self.characters_per_user(chat["chat_id"], 7)
+                    else:
+                        self.send_message("Error, please use the format: /characters\_per\_user \[days]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message("Error, please use the format: /characters\_per\_user \[days]", chat["chat_id"])
                 
             #/help
             elif (words[0] == "/help"):
@@ -265,6 +320,7 @@ class TutorialBotView(View):
                 string+="/get\_user\_most\_sent\_messages \[days]: Get the user with most messages in a certain period of time \n"
                 string+="/innactive\_users \[days]: Get innactive users in a certain period of time \n"
                 string+="/characters\_per\_day \[days]: Get a graph showing the total of characters in a certain period \n"
+                string+="/characters\_per\_user \[days]: Get a graph showing the total of characters sent by users in a certain period \n"
                 self.send_message(string, chat["chat_id"])
                 
             else:
