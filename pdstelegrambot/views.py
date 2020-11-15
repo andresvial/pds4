@@ -123,6 +123,7 @@ class TutorialBotView(View):
             },
             {'$group': {
                     "_id": "$formattedMsgDate",
+                    "date": "datetime",
                     "count":{"$sum":1}
                 }
             }
@@ -152,7 +153,7 @@ class TutorialBotView(View):
             
         #Fill the y list with the respective characters sent by each date position of x
         for i in val:
-            date= i["_id"]
+            date= i["date"]
             if (date in x):
                 y[x.index(date)] = int(i["count"])
             
