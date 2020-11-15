@@ -316,6 +316,18 @@ class TutorialBotView(View):
                         self.send_message("Error, please use the format: /characters\_per\_user \[days]", chat["chat_id"])
                 except Exception as e:
                     self.send_message("Error, please use the format: /characters\_per\_user \[days]", chat["chat_id"])
+                    
+            #10:/most_popular_message
+            elif (words[0] == "/most_popular_message"):
+                try:
+                    if(len(words)==2 and int(words[1])>0):
+                        self.characters_per_user(chat["chat_id"], int(words[1]))
+                    elif(len(words)==1):
+                        self.characters_per_user(chat["chat_id"], 7)
+                    else:
+                        self.send_message("Error, please use the format: /most\_popular\_message \[days]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message("Error, please use the format: /most\_popular\_message \[days]", chat["chat_id"])
                 
             #/help
             elif (words[0] == "/help"):
@@ -324,8 +336,9 @@ class TutorialBotView(View):
                 string+="/set\_word <word> <response>: Set a automatic responce for a word sent by a user \n"
                 string+="/get\_user\_most\_sent\_messages \[days]: Get the user with most messages in a certain period of time \n"
                 string+="/innactive\_users \[days]: Get innactive users in a certain period of time \n"
-                string+="/characters\_per\_day \[days]: Get a graph showing the total of characters in a certain period \n"
-                string+="/characters\_per\_user \[days]: Get a graph showing the total of characters sent by users in a certain period \n"
+                string+="/characters\_per\_day \[days]: Get a graph showing the total of characters in a certain period of time\n"
+                string+="/characters\_per\_user \[days]: Get a graph showing the total of characters sent by users in a certain period of time\n"
+                string+="/most\_popular\_message \[days]: Get the most popular message and the user who sent it in a certain period of time\n"
                 self.send_message(string, chat["chat_id"])
                 
             else:
