@@ -149,9 +149,9 @@ class TutorialBotView(View):
             
         #Fill the y list with the respective characters sent by each date position of x
         for i in val:
-            date= str(i["_id"]["day"]) + "/" + str(i["_id"]["month"]) + "/" + str(i["_id"]["year"])
+            date= i["_id"]
             if (date in x):
-                y[x.index(date)] = i["total_messages"]
+                y[x.index(date)] = i["count"]
             
         #Plot the graph and send it
         plt.figure()
