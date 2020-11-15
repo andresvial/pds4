@@ -1,6 +1,4 @@
-import json
-import requests
-import numpy as np
+import json, pymongo, requests
 import matplotlib.pyplot as plt
 from django.http import JsonResponse
 from django.views import View
@@ -37,7 +35,7 @@ class TutorialBotView(View):
         pdstelegrambot_collection.save(chat)
         self.send_message("Response set for " + word, chat["chat_id"])
     ##################################################################################
-        
+    #Pregunta 2: Obtener el usuario que mas mensajes ha enviado
     def get_user_most_sent_messages(self, chat_id, period):
         d = datetime.utcnow() - timedelta(days=period)
         
@@ -108,6 +106,26 @@ class TutorialBotView(View):
 
     ##################################################################################
     #Pregunta 4: Obtener usuarios inactivos en un periodo de tiempo
+    def innactive_users(self, chat_id, period):
+        d = datetime.utcnow() - timedelta(days=period)
+        
+        users_in_period = message_collection.find({"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}).distinct('user_id')
+        
+        all_users = message_collection.find({ "chat_id" : chat_id}).distinct('user_id')
+        
+        set_difference = set(all_users) - set(users_in_period)
+        list_difference = list(set_difference)
+        
+        string=""
+        if len(list_difference)==0:
+            self.send_message("No inactive user found", chat_id)
+            
+        else:       
+            for u_id in list_difference:
+                usr = self.get_user_info(chat_id, u_id)
+                string += usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"] + '\n'
+            
+            self.send_message("Inactive users in "+ str(period) +" days: \n" + string, chat_id)
 
     ##################################################################################
     # Pregunta 5 Mensajes x Dia
@@ -165,31 +183,7 @@ class TutorialBotView(View):
         plt.title('Messages sent across the past '+ str(period) +" days" )
         plt.savefig('messages_per_day.png', bbox_inches='tight')
         self.send_photo('messages_per_day.png', chat_id)
-        
-    
-    ##################################################################################
-    def innactive_users(self, chat_id, period):
-        d = datetime.utcnow() - timedelta(days=period)
-        
-        users_in_period = message_collection.find({"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}).distinct('user_id')
-        
-        all_users = message_collection.find({ "chat_id" : chat_id}).distinct('user_id')
-        
-        set_difference = set(all_users) - set(users_in_period)
-        list_difference = list(set_difference)
-        
-        string=""
-        if len(list_difference)==0:
-            self.send_message("No inactive user found", chat_id)
-            
-        else:       
-            for u_id in list_difference:
-                usr = self.get_user_info(chat_id, u_id)
-                string += usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"] + '\n'
-            
-            self.send_message("Inactive users in "+ str(period) +" days: \n" + string, chat_id)
-    
-    
+       
     ##################################################################################
     #Pregunta 6: obtener un grafico de la cantidad de caracteres por dia en un periodo de dias
     def characters_per_day(self, chat_id, period):
@@ -286,7 +280,23 @@ class TutorialBotView(View):
         self.send_photo('characters_per_user.png', chat_id)
         
     ##################################################################################
+    #Pregunta 10: obtener el mensaje mas popular en un periodo de tiempo
+    def most_popular_message(self, chat_id, period):
+        d= datetime.utcnow() - timedelta(days=period)
+        
+        #Query the most replied message in the chat in a certain period
+        val = list(message_collection.find({"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}).sort("replies", pymongo.DESCENDING).limit(1))
+        
+        #Get the user first name and last name of the most replied message
+        usr = requests.get(f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": val[0]["user_id"]})
+        usr = json.loads(usr.content)
+        usr = usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"]
+        
+        result = "The most popular message is '" + val[0]["message"] + "' sent by " + usr
+        self.send_message(result, chat_id)
+        
     
+    ##################################################################################
     def post(self, request, *args, **kwargs):
         t_data = json.loads(request.body)
         print(t_data)
@@ -393,9 +403,9 @@ class TutorialBotView(View):
             elif (words[0] == "/most_popular_message"):
                 try:
                     if(len(words)==2 and int(words[1])>0):
-                        self.characters_per_user(chat["chat_id"], int(words[1]))
+                        self.most_popular_message(chat["chat_id"], int(words[1]))
                     elif(len(words)==1):
-                        self.characters_per_user(chat["chat_id"], 7)
+                        self.most_popular_message(chat["chat_id"], 7)
                     else:
                         self.send_message("Error, please use the format: /most\_popular\_message \[days]", chat["chat_id"])
                 except Exception as e:
