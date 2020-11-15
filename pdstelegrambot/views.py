@@ -139,7 +139,7 @@ class TutorialBotView(View):
             self.send_message("Error in the request", chat_id)
 
         x = []
-        y = []
+        y=[0] * period
         
         #Fill the x list with the dates for the graphs
         base=datetime.utcnow()
@@ -151,16 +151,16 @@ class TutorialBotView(View):
         for i in val:
             date= str(i["_id"]["day"]) + "/" + str(i["_id"]["month"]) + "/" + str(i["_id"]["year"])
             if (date in x):
-                y[x.index(date)] = i["total_characters"]
+                y[x.index(date)] = i["total_messages"]
             
         #Plot the graph and send it
         plt.figure()
         ax = plt.subplot()
         plt.xticks(rotation=90)
         ax.bar(x,y)
-        plt.title('Characters sent across the past '+ str(period) +" days" )
-        plt.savefig('characters_per_day.png', bbox_inches='tight')
-        self.send_photo('characters_per_day.png', chat_id)
+        plt.title('Messages sent across the past '+ str(period) +" days" )
+        plt.savefig('messages_per_day.png', bbox_inches='tight')
+        self.send_photo('messages_per_day.png', chat_id)
         
     
     ##################################################################################
