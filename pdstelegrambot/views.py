@@ -108,6 +108,65 @@ class TutorialBotView(View):
 
     ##################################################################################
     #Pregunta 4: Obtener usuarios inactivos en un periodo de tiempo
+
+    ##################################################################################
+    # Pregunta 5 Mensajes x Dia
+    def get_messages_by_day(self, chat_id, period):
+        d = datetime.utcnow() - timedelta(days=period)
+        
+        agr = [
+            {"$match": {"$and": [{ "chat_id" : -439406000}, {"datetime": {"$gte": d}}]}},
+            {'$project': 
+                { 'formattedMsgDate':
+                        { "$dateToString": {'format':"%Y-%m-%d", 'date':"$datetime"}}
+                }
+            },
+            {'$group': {
+                    "_id": "$formattedMsgDate",
+                    "count":{"$sum":1}
+                }
+            }
+        ]
+        
+        val = list(message_collection.aggregate(agr))
+        
+        #pasar los datos en val a una imagen
+        
+        usr = val[0]
+        if usr:
+            r = ""
+            for i in val:
+                r+= i["_id"] + ": " + i["count"] + "\n"
+            self.send_message("The ammount of messages by day sent in the past "+ str(period) +" days is:\n" + r, chat_id)
+        else:
+            self.send_message("Error in the request", chat_id)
+
+        x = []
+        y=[0] * period
+        
+        #Fill the x list with the dates for the graphs
+        base=datetime.utcnow()
+        for i in reversed(range(period)):
+            aux= base - timedelta(days=int(i))
+            x.append(str(aux.day) + "/" + str(aux.month) + "/" + str(aux.year))
+            
+        #Fill the y list with the respective characters sent by each date position of x
+        for i in val:
+            date= i["_id"]
+            if (date in x):
+                y[x.index(date)] = i["count"]
+            
+        #Plot the graph and send it
+        plt.figure()
+        ax = plt.subplot()
+        plt.xticks(rotation=90)
+        ax.bar(x,y)
+        plt.title('Messages sent across the past '+ str(period) +" days" )
+        plt.savefig('messages_per_day.png', bbox_inches='tight')
+        self.send_photo('messages_per_day.png', chat_id)
+        
+    
+    ##################################################################################
     def innactive_users(self, chat_id, period):
         d = datetime.utcnow() - timedelta(days=period)
         
