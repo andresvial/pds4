@@ -362,7 +362,7 @@ class TutorialBotView(View):
                     else:
                         self.send_message("Error, please use the format: /message\_per\_day \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
+                    self.send_message("Error, please use the format: /message\_per\_day \[days]", chat["chat_id"])
             
             #6:/characters_per_day [days]
             elif (words[0] == "/characters_per_day"):    
