@@ -154,7 +154,7 @@ class TutorialBotView(View):
         for i in val:
             date= i["_id"]
             if (date in x):
-                y[x.index(date)] = i["count"]
+                y[x.index(date)] = int(i["count"])
             
         #Plot the graph and send it
         plt.figure()
@@ -360,9 +360,9 @@ class TutorialBotView(View):
                     elif(len(words)==1):
                         self.messages_per_day(chat["chat_id"], 7)
                     else:
-                        self.send_message("Error, please use the format: /message\_per\_day \[days]", chat["chat_id"])
+                        self.send_message("Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("Error, please use the format: /message\_per\_day \[days]", chat["chat_id"])
+                    self.send_message("Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
             
             #6:/characters_per_day [days]
             elif (words[0] == "/characters_per_day"):    
