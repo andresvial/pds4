@@ -137,6 +137,31 @@ class TutorialBotView(View):
             self.send_message("The ammount of messages by day sent in the past "+ str(period) +" days is:\n" + r, chat_id)
         else:
             self.send_message("Error in the request", chat_id)
+
+        x = []
+        y = []
+        
+        #Fill the x list with the dates for the graphs
+        base=datetime.utcnow()
+        for i in reversed(range(period)):
+            aux= base - timedelta(days=int(i))
+            x.append(str(aux.day) + "/" + str(aux.month) + "/" + str(aux.year))
+            
+        #Fill the y list with the respective characters sent by each date position of x
+        for i in val:
+            date= str(i["_id"]["day"]) + "/" + str(i["_id"]["month"]) + "/" + str(i["_id"]["year"])
+            if (date in x):
+                y[x.index(date)] = i["total_characters"]
+            
+        #Plot the graph and send it
+        plt.figure()
+        ax = plt.subplot()
+        plt.xticks(rotation=90)
+        ax.bar(x,y)
+        plt.title('Characters sent across the past '+ str(period) +" days" )
+        plt.savefig('characters_per_day.png', bbox_inches='tight')
+        self.send_photo('characters_per_day.png', chat_id)
+        
     
     ##################################################################################
     def innactive_users(self, chat_id, period):
