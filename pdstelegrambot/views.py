@@ -111,7 +111,7 @@ class TutorialBotView(View):
 
     ##################################################################################
     # Pregunta 5 Mensajes x Dia
-    def get_messages_by_day(self, chat_id, period):
+    def messages_per_day(self, chat_id, period):
         d = datetime.utcnow() - timedelta(days=period)
         
         agr = [
