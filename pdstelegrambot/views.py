@@ -118,7 +118,7 @@ class TutorialBotView(View):
             {"$match": {"$and": [{ "chat_id" : -439406000}, {"datetime": {"$gte": d}}]}},
             {'$project': 
                 { 'formattedMsgDate':
-                        { "$dateToString": {'format':"%Y-%m-%d", 'date':"$datetime"}}
+                        { "$dateToString": {'format':"%Y/%m/%d", 'date':"$datetime"}}
                 }
             },
             {'$group': {
