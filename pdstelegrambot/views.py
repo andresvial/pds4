@@ -108,6 +108,66 @@ class TutorialBotView(View):
 
     ##################################################################################
     #Pregunta 4: Obtener usuarios inactivos en un periodo de tiempo
+
+    ##################################################################################
+    # Pregunta 5 Mensajes x Dia
+    def messages_per_day(self, chat_id, period):
+        d = datetime.utcnow() - timedelta(days=period)
+        
+        agr = [
+            {"$match": {"$and": [{ "chat_id" : -439406000}, {"datetime": {"$gte": d}}]}},
+            {'$project': 
+                { 'formattedMsgDate':
+                        { "$dateToString": {'format':"%Y/%m/%d", 'date':"$datetime"}}
+                }
+            },
+            {'$group': {
+                    "_id": "$formattedMsgDate",
+                    "date": "datetime",
+                    "count":{"$sum":1}
+                }
+            }
+        ]
+        
+        val = list(message_collection.aggregate(agr))
+        
+        #pasar los datos en val a una imagen
+        
+        usr = val[0]
+        if usr:
+            r = ""
+            for i in val:
+                r+= i["_id"] + ": " + i["count"] + "\n"
+            self.send_message("The ammount of messages by day sent in the past "+ str(period) +" days is:\n" + r, chat_id)
+        else:
+            self.send_message("Error in the request", chat_id)
+
+        x = []
+        y=[0] * period
+        
+        #Fill the x list with the dates for the graphs
+        base=datetime.utcnow()
+        for i in reversed(range(period)):
+            aux= base - timedelta(days=int(i))
+            x.append(str(aux.day) + "/" + str(aux.month) + "/" + str(aux.year))
+            
+        #Fill the y list with the respective characters sent by each date position of x
+        for i in val:
+            date= i["date"]
+            if (date in x):
+                y[x.index(date)] = int(i["count"])
+            
+        #Plot the graph and send it
+        plt.figure()
+        ax = plt.subplot()
+        plt.xticks(rotation=90)
+        ax.bar(x,y)
+        plt.title('Messages sent across the past '+ str(period) +" days" )
+        plt.savefig('messages_per_day.png', bbox_inches='tight')
+        self.send_photo('messages_per_day.png', chat_id)
+        
+    
+    ##################################################################################
     def innactive_users(self, chat_id, period):
         d = datetime.utcnow() - timedelta(days=period)
         
@@ -292,6 +352,18 @@ class TutorialBotView(View):
                         self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
                 except Exception as e:
                     self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
+            
+            #5:/messages_per_day [days]
+            elif (words[0] == "/messages_per_day"):        
+                try:
+                    if(len(words)==2 and int(words[1])>0):
+                        self.messages_per_day(chat["chat_id"], int(words[1]))
+                    elif(len(words)==1):
+                        self.messages_per_day(chat["chat_id"], 7)
+                    else:
+                        self.send_message("(Message) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message("(Exception) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
             
             #6:/characters_per_day [days]
             elif (words[0] == "/characters_per_day"):    
