@@ -139,9 +139,14 @@ class TutorialBotView(View):
                         { "$dateToString": {'format':"%Y/%m/%d", 'date':"$datetime"}}
                 }
             },
+            
             {'$group': {
                     "_id": "$formattedMsgDate",
-                    "date": "datetime",
+                    "_date": {
+                        "day": { "$dayOfMonth": "$datetime" },
+                        "month": { "$month": "$datetime" },
+                        "year": { "$year": "$datetime" }
+                    },
                     "count":{"$sum":1}
                 }
             }
@@ -171,7 +176,7 @@ class TutorialBotView(View):
             
         #Fill the y list with the respective characters sent by each date position of x
         for i in val:
-            date= i["date"]
+            date= str(i["_date"]["day"]) + "/" + str(i["_date"]["month"]) + "/" + str(i["_date"]["year"])
             if (date in x):
                 y[x.index(date)] = int(i["count"])
             
