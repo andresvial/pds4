@@ -151,16 +151,6 @@ class TutorialBotView(View):
         val = list(message_collection.aggregate(agr))
         
         #pasar los datos en val a una imagen
-        
-        usr = val[0]
-        if usr:
-            r = ""
-            for i in val:
-                r+= i["_id"] + ": " + str(i["count"]) + "\n"
-            #self.send_message("The ammount of messages by day sent in the past "+ str(period) +" days is:\n" + r, chat_id)
-        else:
-            #self.send_message("Error in the request", chat_id)
-            pass
 
         x = []
         y=[0] * period
@@ -239,6 +229,9 @@ class TutorialBotView(View):
         
     
     ###################################################################################
+    #Pregunta 7: 
+    
+    ###################################################################################
     #Pregunta 8: obtener un grafico de la cantidad de caracteres por usuario en un periodo de dias
     def characters_per_user(self, chat_id, period):
         #Get date minus the period of days
@@ -268,8 +261,9 @@ class TutorialBotView(View):
         for i in val:
             usr = requests.get(f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": i["_id"]["user_id"]})
             usr = json.loads(usr.content)
-            x.append(usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"])
-            y.append(i["characters"])
+            if (usr):
+                x.append(usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"])
+                y.append(i["characters"])
             
         
         #Plot the graph and send it
