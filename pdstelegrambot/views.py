@@ -275,6 +275,9 @@ class TutorialBotView(View):
         self.send_photo('characters_per_user.png', chat_id)
         
     ##################################################################################
+    #Pregunta 9: 
+
+    ##################################################################################
     #Pregunta 10: obtener el mensaje mas popular en un periodo de tiempo
     def most_popular_message(self, chat_id, period):
         d= datetime.utcnow() - timedelta(days=period)
@@ -290,6 +293,8 @@ class TutorialBotView(View):
         result = "The most popular message is '" + val[0]["message"] + "' sent by " + usr
         self.send_message(result, chat_id)
         
+    ##################################################################################
+    #Pregunta 11:
     
     ##################################################################################
     def post(self, request, *args, **kwargs):
