@@ -136,7 +136,7 @@ class TutorialBotView(View):
             {"$match": {"$and": [{ "chat_id" : -439406000}, {"datetime": {"$gte": d}}]}},
             {'$project': 
                 { 'formattedMsgDate':
-                        { "$dateToString": {'format':"%Y/%m/%d", 'date':"$datetime"}}
+                        { "$dateToString": {'format':"%d/%m/%Y", 'date':"$datetime"}}
                 }
             },
             
@@ -169,7 +169,7 @@ class TutorialBotView(View):
         base=datetime.utcnow()
         for i in reversed(range(period)):
             aux= base - timedelta(days=int(i))
-            x.append(str(aux.year) + "/" + str(aux.month) + "/" + str(aux.day))
+            x.append(str(aux.day) + "/" + str(aux.month) + "/" + str(aux.year))
             
         #Fill the y list with the respective characters sent by each date position of x
         for i in val:
