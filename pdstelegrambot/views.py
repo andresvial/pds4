@@ -156,7 +156,7 @@ class TutorialBotView(View):
         if usr:
             r = ""
             for i in val:
-                r+= i["_id"] + ": " + i["count"] + "\n"
+                r+= i["_id"] + ": " + str(i["count"]) + "\n"
             #self.send_message("The ammount of messages by day sent in the past "+ str(period) +" days is:\n" + r, chat_id)
         else:
             #self.send_message("Error in the request", chat_id)
