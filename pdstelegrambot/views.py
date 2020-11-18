@@ -371,15 +371,15 @@ class TutorialBotView(View):
             
             #5:/messages_per_day [days]
             elif (words[0] == "/messages_per_day"):        
-                try:
-                    if(len(words)==2 and int(words[1])>0):
-                        self.messages_per_day(chat["chat_id"], int(words[1]))
-                    elif(len(words)==1):
-                        self.messages_per_day(chat["chat_id"], 7)
-                    else:
-                        self.send_message("(Message) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
-                except Exception as e:
-                    self.send_message("(Exception) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
+                #try:
+                if(len(words)==2 and int(words[1])>0):
+                    self.messages_per_day(chat["chat_id"], int(words[1]))
+                elif(len(words)==1):
+                    self.messages_per_day(chat["chat_id"], 7)
+                else:
+                    self.send_message("(Message) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
+                #except Exception as e:
+                #    self.send_message("(Exception) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
             
             #6:/characters_per_day [days]
             elif (words[0] == "/characters_per_day"):    
