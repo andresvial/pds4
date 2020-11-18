@@ -133,7 +133,7 @@ class TutorialBotView(View):
         d = datetime.utcnow() - timedelta(days=period)
         
         agr = [
-            {"$match": {"$and": [{ "chat_id" : -439406000}, {"datetime": {"$gte": d}}]}},
+            {"$match": {"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}},
             {'$project': 
                 { 'formattedMsgDate':
                         { "$dateToString": {'format':"%d/%m/%Y", 'date':"$datetime"}}
@@ -142,7 +142,6 @@ class TutorialBotView(View):
             
             {'$group': {
                     "_id": "$formattedMsgDate",
-                    
                     "count":{"$sum":1}
                 }
             }
