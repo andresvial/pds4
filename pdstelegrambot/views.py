@@ -161,9 +161,10 @@ class TutorialBotView(View):
             r = ""
             for i in val:
                 r+= i["_id"] + ": " + i["count"] + "\n"
-            self.send_message("The ammount of messages by day sent in the past "+ str(period) +" days is:\n" + r, chat_id)
+            #self.send_message("The ammount of messages by day sent in the past "+ str(period) +" days is:\n" + r, chat_id)
         else:
-            self.send_message("Error in the request", chat_id)
+            #self.send_message("Error in the request", chat_id)
+            pass
 
         x = []
         y=[0] * period
@@ -172,11 +173,11 @@ class TutorialBotView(View):
         base=datetime.utcnow()
         for i in reversed(range(period)):
             aux= base - timedelta(days=int(i))
-            x.append(str(aux.day) + "/" + str(aux.month) + "/" + str(aux.year))
+            x.append(str(aux.year) + "/" + str(aux.month) + "/" + str(aux.day))
             
         #Fill the y list with the respective characters sent by each date position of x
         for i in val:
-            date= str(i["_date"]["day"]) + "/" + str(i["_date"]["month"]) + "/" + str(i["_date"]["year"])
+            date= str(i["_date"]["year"]) + "/" + str(i["_date"]["month"]) + "/" + str(i["_date"]["day"])
             if (date in x):
                 y[x.index(date)] = int(i["count"])
             
