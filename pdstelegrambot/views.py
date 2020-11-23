@@ -334,7 +334,7 @@ class TutorialBotView(View):
         wordcloud = WordCloud(font_path='/Library/Fonts/Verdana.ttf',
                          relative_scaling = 1.0,
                          stopwords = {'to', 'of'} # set or space-separated string
-                         ).generate(text)
+                         ).generate(text_corpus)
 
         #Plot the graph and send it
         plt.imshow(wordcloud)
