@@ -229,7 +229,7 @@ class TutorialBotView(View):
     
     ###################################################################################
     #Pregunta 7: Mensajes por usuario
-    def messager_per_user(self, chat_id, period):
+    def messages_per_user(self, chat_id, period):
         d = datetime.utcnow() - timedelta(days=period)
 
         agr = [
@@ -425,17 +425,17 @@ class TutorialBotView(View):
                 except Exception as e:
                     self.send_message("Error, please use the format: /characters\_per\_day \[days]", chat["chat_id"])
             
-            #7:/messager_per_user [days]
-            elif (words[0] == "/messager_per_user"):        
-                #try:
-                if(len(words)==2 and int(words[1])>0):
-                    self.messages_per_day(chat["chat_id"], int(words[1]))
-                elif(len(words)==1):
-                    self.messages_per_day(chat["chat_id"], 7)
-                else:
-                    self.send_message("(Message) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
-                #except Exception as e:
-                #    self.send_message("(Exception) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
+            #7:/messages_per_user [days]
+            elif (words[0] == "/messages_per_user"):        
+                try:
+                    if(len(words)==2 and int(words[1])>0):
+                        self.messages_per_user(chat["chat_id"], int(words[1]))
+                    elif(len(words)==1):
+                        self.messages_per_user(chat["chat_id"], 7)
+                    else:
+                        self.send_message("(Message) Error, please use the format: /messages\_per\_user \[days]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message("(Exception) Error, please use the format: /messages\_per\_user \[days]", chat["chat_id"])
             
                    
             #8:/characters_per_user [days]
