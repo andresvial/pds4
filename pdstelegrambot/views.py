@@ -234,17 +234,11 @@ class TutorialBotView(View):
 
         agr = [
             {"$match": {"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}},
-            {'$project': 
-                { 'formattedMsgDate':
-                        { "$dateToString": {'format':"%d/%m/%Y", 'date':"$datetime"}}
-                }
-            },
             
             {'$group': {
                     "_id": {
                             "user_id": "$user_id",
                     },
-                    "_date": "$formattedMsgDate",
                     "count": {"$sum":1}
                 }
             }
@@ -254,7 +248,7 @@ class TutorialBotView(View):
         
         #Lists to plot later
         x=[]
-        y=[0]*period
+        y=[]
         
         #Iterate in the query obtained and append each user and its sum of messages to x and y
         for i in val:
@@ -430,7 +424,20 @@ class TutorialBotView(View):
                         self.send_message("Error, please use the format: /characters\_per\_day \[days]", chat["chat_id"])
                 except Exception as e:
                     self.send_message("Error, please use the format: /characters\_per\_day \[days]", chat["chat_id"])
-                    
+            
+            #7:/messager_per_user [days]
+            elif (words[0] == "/messager_per_user"):        
+                #try:
+                if(len(words)==2 and int(words[1])>0):
+                    self.messages_per_day(chat["chat_id"], int(words[1]))
+                elif(len(words)==1):
+                    self.messages_per_day(chat["chat_id"], 7)
+                else:
+                    self.send_message("(Message) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
+                #except Exception as e:
+                #    self.send_message("(Exception) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
+            
+                   
             #8:/characters_per_user [days]
             elif (words[0] == "/characters_per_user"):    
                 try:
