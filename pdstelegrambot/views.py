@@ -264,7 +264,7 @@ class TutorialBotView(View):
         ax = plt.subplot()
         plt.xticks(rotation=90)
         ax.bar(x,y)
-        plt.title("Messages sent per user")
+        plt.title(str("Messages sent per user in the past", period, "days"))
         plt.savefig('messages_per_user.png', bbox_inches='tight')  
         self.send_photo('messages_per_user.png', chat_id)
 
