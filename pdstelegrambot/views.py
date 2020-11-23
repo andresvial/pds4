@@ -488,7 +488,7 @@ class TutorialBotView(View):
                     else:
                         self.send_message("Error, please use the format: /words\_cloud \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("Error, please use the format: /words\_cloud \[days]", chat["chat_id"])
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
                   
 
             #10:/most_popular_message
