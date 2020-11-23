@@ -1,6 +1,5 @@
 import json, pymongo, requests
 import matplotlib.pyplot as plt
-from scipy.misc import imread
 from django.http import JsonResponse
 from django.views import View
 from datetime import datetime,timedelta
