@@ -338,6 +338,7 @@ class TutorialBotView(View):
 
         #Plot the graph and send it
         plt.imshow(wordcloud)
+        #help
         plt.title(f"Words cloud of the past {period} days.")
         plt.savefig('words_cloud.png', bbox_inches='tight')  
         self.send_photo('words_cloud.png', chat_id)
