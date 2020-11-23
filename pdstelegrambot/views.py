@@ -228,8 +228,52 @@ class TutorialBotView(View):
         
     
     ###################################################################################
-    #Pregunta 7: 
-    
+    #Pregunta 7: Mensajes por usuario
+    def messager_per_user(self, chat_id, period):
+        d = datetime.utcnow() - timedelta(days=period)
+
+        agr = [
+            {"$match": {"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}},
+            {'$project': 
+                { 'formattedMsgDate':
+                        { "$dateToString": {'format':"%d/%m/%Y", 'date':"$datetime"}}
+                }
+            },
+            
+            {'$group': {
+                    "_id": {
+                            "user_id": "$user_id",
+                    },
+                    "_date": "$formattedMsgDate",
+                    "count": {"$sum":1}
+                }
+            }
+        ]
+
+        val = list(message_collection.aggregate(agr))
+        
+        #Lists to plot later
+        x=[]
+        y=[0]*period
+        
+        #Iterate in the query obtained and append each user and its sum of messages to x and y
+        for i in val:
+            usr = requests.get(f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": i["_id"]["user_id"]})
+            usr = json.loads(usr.content)
+            if (usr):
+                x.append(usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"])
+                y.append(i["count"])
+            
+        
+        #Plot the graph and send it
+        plt.figure()
+        ax = plt.subplot()
+        plt.xticks(rotation=90)
+        ax.bar(x,y)
+        plt.title("Messages sent per user")
+        plt.savefig('messages_per_user.png', bbox_inches='tight')  
+        self.send_photo('messages_per_user.png', chat_id)
+
     ###################################################################################
     #Pregunta 8: obtener un grafico de la cantidad de caracteres por usuario en un periodo de dias
     def characters_per_user(self, chat_id, period):
