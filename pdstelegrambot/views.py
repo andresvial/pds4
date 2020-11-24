@@ -338,7 +338,11 @@ class TutorialBotView(View):
                 'lo',
                 'que',
                 'si',
-                'de'
+                'de',
+                'el',
+                'en',
+                'los',
+                'a',
                 } # set or space-separated string
             ).generate(text_corpus)
 
@@ -486,15 +490,15 @@ class TutorialBotView(View):
 
             #9:/words_cloud [days]
             elif (words[0] == "/words_cloud"):    
-                #try:
-                if(len(words)==2 and int(words[1])>0):
-                    self.words_cloud(chat["chat_id"], int(words[1]))
-                elif(len(words)==1):
-                    self.words_cloud(chat["chat_id"], 7)
-                else:
-                    self.send_message("Error, please use the format: /words\_cloud \[days]", chat["chat_id"])
-                #except Exception as e:
-                #    self.send_message(f"Exception: {e}", chat["chat_id"])
+                try:
+                    if(len(words)==2 and int(words[1])>0):
+                        self.words_cloud(chat["chat_id"], int(words[1]))
+                    elif(len(words)==1):
+                        self.words_cloud(chat["chat_id"], 7)
+                    else:
+                        self.send_message("Error, please use the format: /words\_cloud \[days]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
                   
 
             #10:/most_popular_message
