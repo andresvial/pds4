@@ -331,8 +331,7 @@ class TutorialBotView(View):
         for i in val:
             text_corpus += i["message"]
             
-        wordcloud = WordCloud(font_path='/Library/Fonts/Verdana.ttf',
-            relative_scaling = 1.0,
+        wordcloud = WordCloud(relative_scaling = 1.0,
             stopwords = {
                 'la', 
                 'con',
