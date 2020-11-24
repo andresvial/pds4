@@ -332,13 +332,20 @@ class TutorialBotView(View):
             text_corpus += i["message"]
             
         wordcloud = WordCloud(font_path='/Library/Fonts/Verdana.ttf',
-                         relative_scaling = 1.0,
-                         stopwords = {'to', 'of'} # set or space-separated string
-                         ).generate(text_corpus)
+            relative_scaling = 1.0,
+            stopwords = {
+                'la', 
+                'con',
+                'lo',
+                'que',
+                'si',
+                'de'
+                } # set or space-separated string
+            ).generate(text_corpus)
 
-        #Plot the graph and send it
-        plt.imshow(wordcloud)
         #help
+        #Plot the graph and send it
+        plt.imshow(wordcloud) 
         plt.title(f"Words cloud of the past {period} days.")
         plt.savefig('words_cloud.png', bbox_inches='tight')  
         self.send_photo('words_cloud.png', chat_id)
