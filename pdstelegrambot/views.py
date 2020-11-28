@@ -362,12 +362,17 @@ class TutorialBotView(View):
         val = list(message_collection.find({"$and": [{ "chat_id" : chat_id}, {"datetime": {"$gte": d}}]}).sort("replies", pymongo.DESCENDING).limit(1))
         
         #Get the user first name and last name of the most replied message
-        usr = requests.get(f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": val[0]["user_id"]})
-        usr = json.loads(usr.content)
-        usr = usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"]
+        if (len(val)>0):
+            usr = requests.get(f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": val[0]["user_id"]})
+            usr = json.loads(usr.content)
+            usr = usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"]
         
-        result = "The most popular message is '" + val[0]["message"] + "' sent by " + usr
-        self.send_message(result, chat_id)
+            result = "The most popular message is '" + val[0]["message"] + "' sent by " + usr
+            self.send_message(result, chat_id)
+            
+        else:
+            result = "There hasn't been any messages in these " + str(period) + " days"
+            self.send_message(result, chat_id)
         
     ##################################################################################
     #Pregunta 11:
