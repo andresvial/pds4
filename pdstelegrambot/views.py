@@ -16,8 +16,6 @@ TUTORIAL_BOT_TOKEN = "1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo"
 #correo
 port = 465
 smtp_server = "smtp.gmail.com"
-sender_email = "pdstelegrambot@gmail.com"
-password= "pds123456789"
   
 # https://api.telegram.org/bot1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo/setWebhook?url=<url>/webhooks/tutorial/
 class TutorialBotView(View):
@@ -381,15 +379,19 @@ class TutorialBotView(View):
         usr = usr = requests.get(f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": val[0]["user_id"]})
         usr = json.loads(usr.content)
         usr = usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"]
-    
+
+        sender_email = "pdstelegrambot@gmail.com"
+        password= "pds123456789"
+        
         message = f"""\
         Subject: Last message recieved
 
         The last message recieved:
+
         Sender: {usr}
         Content: {val[0]["message"]}
 
-        This message is sent from Python."""
+        This message is sent from pdstelegrambot with Python."""
 
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
