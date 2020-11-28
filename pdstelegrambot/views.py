@@ -329,12 +329,9 @@ class TutorialBotView(View):
         
         #Iterate in the query obtained and append each user and its sum of messages to x and y
         for i in val:
-            text_corpus += i["message"].strip()
+            text_corpus += i["message"]
             
-        wordcloud = WordCloud(relative_scaling = 1.0,
-            stopwords = {
-                } # set or space-separated string
-            ).generate(text_corpus)
+        wordcloud = WordCloud().generate(text_corpus)
 
         #help
         #Plot the graph and send it
