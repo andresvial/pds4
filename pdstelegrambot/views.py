@@ -361,7 +361,7 @@ class TutorialBotView(View):
             self.send_message(result, chat_id)
             
         else:
-            result = "There hasn't been any messages in these " + str(period) + " days"
+            result = "There hasn't been any popular messages in these " + str(period) + " days"
             self.send_message(result, chat_id)
         
     ##################################################################################
