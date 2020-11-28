@@ -509,9 +509,13 @@ class TutorialBotView(View):
                 string=""
                 string+="/set\_word <word> <response>: Set a automatic responce for a word sent by a user \n"
                 string+="/get\_user\_most\_sent\_messages \[days]: Get the user with most messages in a certain period of time \n"
+                string+="/get\_user\_most\_sent\_characters \[days]: Get the user with most characters in a certain period of time \n"
                 string+="/innactive\_users \[days]: Get innactive users in a certain period of time \n"
+                string+="/messages\_per\_day \[days]: Get a graph showing the total of messages in a certain period of time\n"
                 string+="/characters\_per\_day \[days]: Get a graph showing the total of characters in a certain period of time\n"
+                string+="/messages\_per\_user \[days]: Get a graph showing the total of messages sent by users in a certain period of time\n"
                 string+="/characters\_per\_user \[days]: Get a graph showing the total of characters sent by users in a certain period of time\n"
+                string+="/words\_cloud \[days]: Get a wordcloud of the messages sent in a certain period of time\n"
                 string+="/most\_popular\_message \[days]: Get the most popular message and the user who sent it in a certain period of time\n"
                 self.send_message(string, chat["chat_id"])
                 
