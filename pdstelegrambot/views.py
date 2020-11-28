@@ -1,5 +1,6 @@
 import json, pymongo, requests
 import matplotlib.pyplot as plt
+import smtplib, ssl
 from django.http import JsonResponse
 from django.views import View
 from datetime import datetime,timedelta
@@ -11,6 +12,12 @@ from wordcloud import WordCloud, STOPWORDS
 
 TELEGRAM_URL = "https://api.telegram.org/bot"
 TUTORIAL_BOT_TOKEN = "1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo"
+
+#correo
+port = 465
+smtp_server = "smtp.gmail.com"
+sender_email = "pdstelegrambot@gmail.com"
+password= "pds123456789"
   
 # https://api.telegram.org/bot1284944972:AAHuf8KsNu2qcLUZN3K37b0gl53wN5QLtzo/setWebhook?url=<url>/webhooks/tutorial/
 class TutorialBotView(View):
@@ -363,6 +370,27 @@ class TutorialBotView(View):
         
     ##################################################################################
     #Pregunta 11:
+    def email_last_message(self, chat_id, receiver_email):
+        agr = [
+            {"$match": { "chat_id" : chat_id}},
+            {"$sort":{'message_id':-1}},
+            {"$limit": 1}        
+        ]
+        val = list(db.aggregate(agr))
+        
+        message = f"""\
+        Subject: Last message recieved
+
+        The last message recieved:
+        Sender: pending
+        Content: {val[0]["message"]}
+
+        This message is sent from Python."""
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message)
     
     ##################################################################################
     def post(self, request, *args, **kwargs):
@@ -404,7 +432,7 @@ class TutorialBotView(View):
                     else:
                         self.send_message("Error, please use the format: /get\_user\_most\_sent\_messages \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("Error, please use the format: /get\_user\_most\_sent\_messages \[days]", chat["chat_id"])
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
 
             #3:/get_user_most_sent_characters [days]
             elif (words[0] == "/get_user_most_sent_characters"):
@@ -416,7 +444,7 @@ class TutorialBotView(View):
                     else:
                         self.send_message("Error, please use the format: /get\_user\_most\_sent\_characters \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("Error, please use the format: /get\_user\_most\_sent\_characters \[days]", chat["chat_id"])
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
                     
                  
             #4:/innactive_users [days]
@@ -429,19 +457,19 @@ class TutorialBotView(View):
                     else:
                         self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("Error, please use the format: /innactive\_users \[days]", chat["chat_id"])
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
             
             #5:/messages_per_day [days]
             elif (words[0] == "/messages_per_day"):        
-                #try:
-                if(len(words)==2 and int(words[1])>0):
-                    self.messages_per_day(chat["chat_id"], int(words[1]))
-                elif(len(words)==1):
-                    self.messages_per_day(chat["chat_id"], 7)
-                else:
-                    self.send_message("(Message) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
-                #except Exception as e:
-                #    self.send_message("(Exception) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
+                try:
+                    if(len(words)==2 and int(words[1])>0):
+                        self.messages_per_day(chat["chat_id"], int(words[1]))
+                    elif(len(words)==1):
+                        self.messages_per_day(chat["chat_id"], 7)
+                    else:
+                        self.send_message("(Message) Error, please use the format: /messages\_per\_day \[days]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
             
             #6:/characters_per_day [days]
             elif (words[0] == "/characters_per_day"):    
@@ -453,7 +481,7 @@ class TutorialBotView(View):
                     else:
                         self.send_message("Error, please use the format: /characters\_per\_day \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("Error, please use the format: /characters\_per\_day \[days]", chat["chat_id"])
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
             
             #7:/messages_per_user [days]
             elif (words[0] == "/messages_per_user"):        
@@ -465,7 +493,7 @@ class TutorialBotView(View):
                     else:
                         self.send_message("(Message) Error, please use the format: /messages\_per\_user \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("(Exception) Error, please use the format: /messages\_per\_user \[days]", chat["chat_id"])
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
             
                    
             #8:/characters_per_user [days]
@@ -478,7 +506,7 @@ class TutorialBotView(View):
                     else:
                         self.send_message("Error, please use the format: /characters\_per\_user \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("Error, please use the format: /characters\_per\_user \[days]", chat["chat_id"])
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
 
             #9:/words_cloud [days]
             elif (words[0] == "/words_cloud"):    
@@ -503,7 +531,17 @@ class TutorialBotView(View):
                     else:
                         self.send_message("Error, please use the format: /most\_popular\_message \[days]", chat["chat_id"])
                 except Exception as e:
-                    self.send_message("Error, please use the format: /most\_popular\_message \[days]", chat["chat_id"])
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
+             
+            #11:/email_last_message
+            elif (words[0] == "/email_last_message"):
+                try:
+                    if(len(words)==2):
+                        self.email_last_message(chat["chat_id"], words[1])
+                    else:
+                        self.send_message("Error, please use the format: /email\_last\_message \[email]", chat["chat_id"])
+                except Exception as e:
+                    self.send_message(f"Exception: {e}", chat["chat_id"])
                 
             #/help
             elif (words[0] == "/help"):
