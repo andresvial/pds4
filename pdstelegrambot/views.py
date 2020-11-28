@@ -557,6 +557,7 @@ class TutorialBotView(View):
                 string+="/characters\_per\_user \[days]: Get a graph showing the total of characters sent by users in a certain period of time\n"
                 string+="/words\_cloud \[days]: Get a wordcloud of the messages sent in a certain period of time\n"
                 string+="/most\_popular\_message \[days]: Get the most popular message and the user who sent it in a certain period of time\n"
+                string+="/email\_last\_message \[email]: Send the last message to the mailbox\n"
                 self.send_message(string, chat["chat_id"])
                 
             else:
