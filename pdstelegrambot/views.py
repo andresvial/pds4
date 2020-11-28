@@ -378,11 +378,15 @@ class TutorialBotView(View):
         ]
         val = list(message_collection.aggregate(agr))
         
+        usr = usr = requests.get(f"{TELEGRAM_URL}{TUTORIAL_BOT_TOKEN}/getChatMember", params={"chat_id": chat_id, "user_id": val[0]["user_id"]})
+        usr = json.loads(usr.content)
+        usr = usr["result"]["user"]["first_name"] + " " +usr["result"]["user"]["last_name"]
+    
         message = f"""\
         Subject: Last message recieved
 
         The last message recieved:
-        Sender: pending
+        Sender: {usr}
         Content: {val[0]["message"]}
 
         This message is sent from Python."""
@@ -391,6 +395,8 @@ class TutorialBotView(View):
         with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
             server.login(sender_email, password)
             server.sendmail(sender_email, receiver_email, message)
+        
+        self.send_message("Email sent", chat_id)
     
     ##################################################################################
     def post(self, request, *args, **kwargs):
