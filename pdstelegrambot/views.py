@@ -376,7 +376,7 @@ class TutorialBotView(View):
             {"$sort":{'message_id':-1}},
             {"$limit": 1}        
         ]
-        val = list(db.aggregate(agr))
+        val = list(message_collection.aggregate(agr))
         
         message = f"""\
         Subject: Last message recieved
