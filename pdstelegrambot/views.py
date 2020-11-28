@@ -383,8 +383,7 @@ class TutorialBotView(View):
         sender_email = "pdstelegrambot@gmail.com"
         password= "pds123456789"
 
-        message = f"""\
-        Subject: Last message recieved
+        message = f"""Subject: Last message recieved
 
         Sender: {usr}
         Content: {val[0]["message"]}
