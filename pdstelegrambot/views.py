@@ -551,7 +551,7 @@ class TutorialBotView(View):
             #/help
             elif (words[0] == "/help"):
                 #Send list of commands
-                string=""
+                string="This is the list of commands of the bot, '<>' are required arguments, '\[]' are optional. If no number of days are passed on \[days], 7 will be the default value \n"
                 string+="/set\_word <word> <response>: Set a automatic responce for a word sent by a user \n"
                 string+="/get\_user\_most\_sent\_messages \[days]: Get the user with most messages in a certain period of time \n"
                 string+="/get\_user\_most\_sent\_characters \[days]: Get the user with most characters in a certain period of time \n"
