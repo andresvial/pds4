@@ -174,6 +174,7 @@ class TutorialBotView(View):
                 y[x.index(date)] = int(i["count"])
             
         #Plot the graph and send it
+        plt.clf()
         plt.figure()
         ax = plt.subplot()
         plt.xticks(rotation=90)
@@ -225,6 +226,7 @@ class TutorialBotView(View):
                 y[x.index(date)] = i["total_characters"]
             
         #Plot the graph and send it
+        plt.clf()
         plt.figure()
         ax = plt.subplot()
         plt.xticks(rotation=90)
@@ -267,6 +269,7 @@ class TutorialBotView(View):
             
         
         #Plot the graph and send it
+        plt.clf()
         plt.figure()
         ax = plt.subplot()
         plt.xticks(rotation=90)
@@ -311,6 +314,7 @@ class TutorialBotView(View):
             
         
         #Plot the graph and send it
+        plt.clf()
         plt.figure()
         ax = plt.subplot()
         plt.xticks(rotation=90)
@@ -340,6 +344,7 @@ class TutorialBotView(View):
 
         #help
         #Plot the graph and send it
+        plt.clf()
         plt.imshow(wordcloud) 
         plt.title(f"Words cloud of the past {period} days.")
         plt.savefig('words_cloud.png', bbox_inches='tight')  
